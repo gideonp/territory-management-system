@@ -1203,10 +1203,7 @@ input:focus-visible {
     min-height: 900px;
 }
 
-/* Keep the table area from collapsing */
-.table-responsive {
-    min-height: 900px;
-}
+ 
 
 /* Keep the empty/loading state visible */
 #territoryTableBody:empty::after {
