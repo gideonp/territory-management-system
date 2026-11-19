@@ -1,252 +1,242 @@
-
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta http-equiv="X-UA-Compatible" content="ie=edge" />
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+        <title>Territory Management</title>
 
-    <title>Territory Management</title>
+        <link rel="stylesheet" href="./css/territory.css" />
+        <link rel="stylesheet" href="./css/word-export.css" />
+    </head>
 
-    <link rel="stylesheet" href="./css/territory.css">
-</head>
-
-<body>
-
-    <div class="territory-container">
-
-        <!-- Header -->
-        <div class="page-header">
-            <div>
-                <span class="header-label">MANAGEMENT SYSTEM</span>
-                <h1>Territory Management</h1>
-                <p>Manage territory assignments, service years and completion records.</p>
-            </div>
-
-            <div class="header-actions">
-                <div class="header-icon">
-                    <span>🗺️</span>
-                </div>
-
-                <button type="button" id="changePasswordBtn" class="logout-btn">
-                    🔑 Change Password
-                </button>
-
-                <button type="button" id="logoutBtn" class="logout-btn">
-                    ↪ Logout
-                </button>
-            </div>
-        </div>
-
-        <!-- Summary -->
-        <div class="summary-grid">
-
-            <div class="summary-card">
-                <div class="summary-icon blue">📍</div>
+    <body>
+        <div class="territory-container">
+            <!-- Header -->
+            <div class="page-header">
                 <div>
-                    <p>Total Territories</p>
-                    <h3 id="totalTerritories">0</h3>
-                </div>
-            </div>
-
-            <div class="summary-card">
-                <div class="summary-icon green">✓</div>
-                <div>
-                    <p>Completed</p>
-                    <h3 id="completedTerritories">0</h3>
-                </div>
-            </div>
-
-            <div class="summary-card">
-                <div class="summary-icon orange">◷</div>
-                <div>
-                    <p>Pending</p>
-                    <h3 id="pendingTerritories">0</h3>
-                </div>
-            </div>
-
-            <div class="summary-card">
-                <div class="summary-icon purple">👥</div>
-                <div>
-                    <p>Assigned Territories</p>
-                    <h3 id="assignedTerritories">0</h3>
-                </div>
-            </div>
-
-        </div>
-
-        <!-- Filter Section -->
-        <div class="filter-card">
-
-            <div class="section-heading">
-                <div>
-                    <h2>Territory Filters</h2>
-                    <p>Filter and sort territory records</p>
+                    <span class="header-label">MANAGEMENT SYSTEM</span>
+                    <h1>Territory Management</h1>
+                    <p>
+                        Manage territory assignments, service years and
+                        completion records.
+                    </p>
                 </div>
 
-                <span class="filter-tag">ADVANCED FILTERS</span>
-            </div>
+                <div class="header-actions">
+                    <div class="header-icon">
+                        <span>🗺️</span>
+                    </div>
 
-            <form id="filterForm" class="filter-grid">
+                    <button
+                        type="button"
+                        id="changePasswordBtn"
+                        class="logout-btn"
+                    >
+                        🔑 Change Password
+                    </button>
 
-                <div class="form-group">
-                    <label for="assigned_to">Assigned To</label>
-
-                    <select name="assigned_to" id="assigned_to">
-                        <option value="">All Groups</option>
-                        <option value="Group 1">Group 1</option>
-                        <option value="Group 2">Group 2</option>
-                        <option value="Group 3">Group 3</option>
-                        <option value="Congregation">Congregation</option>
-                        <option value="RP">RP</option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label for="date_completed">Completion Status</label>
-
-                    <select name="date_completed" id="date_completed">
-                        <option value="">All Statuses</option>
-                        <option value="completed">Completed</option>
-                        <option value="not completed">Not Completed</option>
-                    </select>
-                </div>
-
-                <div class="filter-actions">
-                    <button type="button" id="filterBtn" class="filter-button">
-                        <span>⌕</span> Apply Filters
+                    <button type="button" id="logoutBtn" class="logout-btn">
+                        ↪ Logout
                     </button>
                 </div>
+            </div>
 
-            </form>
-        </div>
-
-        <!-- Table Section -->
-        <div class="table-card">
-
-            <div class="table-heading">
-                <div>
-                    <h2>Territory Records</h2>
-                    <p>Overview of all registered territories</p>
+            <!-- Summary -->
+            <div class="summary-grid">
+                <div class="summary-card">
+                    <div class="summary-icon blue">📍</div>
+                    <div>
+                        <p>Total Territories</p>
+                        <h3 id="totalTerritories">0</h3>
+                    </div>
                 </div>
 
-                <div class="record-count" id="recordCount">
-                    0 Records
+                <div class="summary-card">
+                    <div class="summary-icon green">✓</div>
+                    <div>
+                        <p>Completed</p>
+                        <h3 id="completedTerritories">0</h3>
+                    </div>
+                </div>
+
+                <div class="summary-card">
+                    <div class="summary-icon orange">◷</div>
+                    <div>
+                        <p>Pending</p>
+                        <h3 id="pendingTerritories">0</h3>
+                    </div>
+                </div>
+
+                <div class="summary-card">
+                    <div class="summary-icon purple">👥</div>
+                    <div>
+                        <p>Assigned Territories</p>
+                        <h3 id="assignedTerritories">0</h3>
+                    </div>
                 </div>
             </div>
 
-            <div class="table-responsive">
+            <!-- Filter Section -->
+            <div class="filter-card">
+                <div class="section-heading">
+                    <div>
+                        <h2>Territory Filters</h2>
+                        <p>Filter and sort territory records</p>
+                    </div>
 
-                <table class="territory-table">
-
-                    <thead>
-                        <tr>
-                            <th data-sort="brgy_name">
-                                Barangay <span class="sort-icon">↕</span>
-                            </th>
-
-                            <th data-sort="service_year">
-                                Service Year <span class="sort-icon">↕</span>
-                            </th>
-
-                            <th data-sort="territory_no">
-                                Territory No. <span class="sort-icon">↕</span>
-                            </th>
-
-                            <th data-sort="last_completed">
-                                Last Completed <span class="sort-icon">↕</span>
-                            </th>
-
-                            <th data-sort="assign_to">
-                                Assigned To <span class="sort-icon">↕</span>
-                            </th>
-
-                            <th data-sort="date_assigned">
-                                Date Assigned <span class="sort-icon">↕</span>
-                            </th>
-
-                            <th data-sort="date_completed">
-                                Date Completed <span class="sort-icon">↕</span>
-                            </th>
-
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-
-                    <tbody id="territoryTableBody">
-                        <!-- Supabase records will appear here -->
-                    </tbody>
-
-                    <tfoot id="tfoot">
-                        <tr>
-                            <td colspan="8"></td>
-                        </tr>
-                    </tfoot>
-
-                </table>
-
-            </div>
-
-        </div>
-
-        <div class="page-footer">
-            Territory Management System
-            <span>•</span>
-            Record Management
-        </div>
-
-    </div>
-
-    <!-- Change Password Window -->
-    <div id="passwordModal" class="password-modal" style="display: none;">
-        <div class="password-window">
-
-            <div class="password-titlebar">
-                <span>Change Account Password</span>
-                <button type="button" id="closePasswordModal">X</button>
-            </div>
-
-            <form id="changePasswordForm">
-
-                <div class="password-content">
-                    <p>Enter your new password below.</p>
-
-                    <label for="newPassword">New Password:</label>
-                    <input
-                        type="password"
-                        id="newPassword"
-                        minlength="6"
-                        required
-                        autocomplete="new-password"
-                    >
-
-                    <label for="confirmPassword">Confirm Password:</label>
-                    <input
-                        type="password"
-                        id="confirmPassword"
-                        minlength="6"
-                        required
-                        autocomplete="new-password"
-                    >
-
-                    <div id="passwordMessage"></div>
+                    <span class="filter-tag">ADVANCED FILTERS</span>
                 </div>
 
-                <div class="password-footer">
-                    <button type="submit" id="savePasswordBtn">OK</button>
-                    <button type="button" id="cancelPasswordBtn">Cancel</button>
+                <form id="filterForm" class="filter-grid">
+                    <div class="form-group">
+                        <label for="assigned_to">Assigned To</label>
+
+                        <select name="assigned_to" id="assigned_to">
+                            <option value="">All Groups</option>
+                            <option value="Group 1">Group 1</option>
+                            <option value="Group 2">Group 2</option>
+                            <option value="Group 3">Group 3</option>
+                            <option value="Congregation">Congregation</option>
+                            <option value="RP">RP</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="date_completed">Completion Status</label>
+
+                        <select name="date_completed" id="date_completed">
+                            <option value="">All Statuses</option>
+                            <option value="completed">Completed</option>
+                            <option value="not completed">Not Completed</option>
+                        </select>
+                    </div>
+
+                    <div class="filter-actions">
+                        <button
+                            type="button"
+                            id="filterBtn"
+                            class="filter-button"
+                        >
+                            <span>⌕</span> Apply Filters
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Table Section -->
+            <div class="table-card">
+                <div class="table-heading">
+                    <div>
+                        <h2>Territory Records</h2>
+                        <p>Overview of all registered territories</p>
+                    </div>
+
+                    <div class="table-header-actions">
+                        <div class="record-count" id="recordCount">
+                            0 Records
+                        </div>
+
+                        <button
+                            type="button"
+                            id="exportWordBtn"
+                            class="export-word-btn"
+                        >
+                            📄 Export to Word
+                        </button>
+                    </div>
+                </div>
+                <div class="service-year-display">
+                    <span>Service Year:</span>
+                    <strong id="serviceYearDisplay">Loading...</strong>
+                </div>
+                <div class="table-responsive">
+                    <table class="territory-table">
+                        <thead>
+                            <tr>
+                                <th data-sort="brgy_name">Barangay</th>                                
+                                <th data-sort="territory_no">Terr. No.</th>
+                                <th data-sort="last_completed">
+                                    Last Date Completed*
+                                </th>
+                                <th>Assignment Details</th>
+                                <th>Assignment Details</th>
+                                <th>Assignment Details</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+
+                        <tbody id="territoryTableBody">
+                            <!-- Supabase records will appear here -->
+                        </tbody>
+
+                        <tfoot id="tfoot">
+                            <tr>
+                                <td colspan="8"></td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+
+            <div class="page-footer">
+                Territory Management System
+                <span>•</span>
+                Record Management
+            </div>
+        </div>
+
+        <!-- Change Password Window -->
+        <div id="passwordModal" class="password-modal" style="display: none">
+            <div class="password-window">
+                <div class="password-titlebar">
+                    <span>Change Account Password</span>
+                    <button type="button" id="closePasswordModal">X</button>
                 </div>
 
-            </form>
+                <form id="changePasswordForm">
+                    <div class="password-content">
+                        <p>Enter your new password below.</p>
+
+                        <label for="newPassword">New Password:</label>
+                        <input
+                            type="password"
+                            id="newPassword"
+                            minlength="6"
+                            required
+                            autocomplete="new-password"
+                        />
+
+                        <label for="confirmPassword">Confirm Password:</label>
+                        <input
+                            type="password"
+                            id="confirmPassword"
+                            minlength="6"
+                            required
+                            autocomplete="new-password"
+                        />
+
+                        <div id="passwordMessage"></div>
+                    </div>
+
+                    <div class="password-footer">
+                        <button type="submit" id="savePasswordBtn">OK</button>
+                        <button type="button" id="cancelPasswordBtn">
+                            Cancel
+                        </button>
+                    </div>
+                </form>
+            </div>
         </div>
-    </div>
 
-    <!-- Supabase and Dashboard Scripts -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="./js/supabase.js"></script>
-    <script src="./js/main.js"></script>
-    <script src="./js/event.js"></script>
+        <!-- Supabase and Dashboard Scripts -->
+        <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 
-</body>
+        <script src="./js/supabase.js"></script>
+        <script src="./js/main.js"></script>
+        <script src="./js/event.js"></script>
+        <script src="./js/word-export.js"></script>
+    </body>
 </html>

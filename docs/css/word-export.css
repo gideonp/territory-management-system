@@ -1,0 +1,53 @@
+
+/* =========================================
+   TERRITORY WORD EXPORT
+========================================= */
+
+.table-header-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.export-word-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    padding: 10px 16px;
+    border: 1px solid #174b82;
+    border-radius: 5px;
+    background: linear-gradient(to bottom, #438bd0, #2463a3);
+    color: #ffffff;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.35);
+    transition: background .2s ease;
+}
+
+.export-word-btn:hover {
+    background: linear-gradient(to bottom, #3479bd, #194f89);
+}
+
+.export-word-btn:active {
+    transform: translateY(1px);
+}
+
+.export-word-btn:disabled {
+    opacity: .6;
+    cursor: wait;
+}
+
+@media (max-width: 650px) {
+    .table-header-actions {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .export-word-btn {
+        flex: 1;
+    }
+}

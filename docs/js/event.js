@@ -10,7 +10,10 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     const db = window.supabaseClient;
 
-    // Check if the user is authenticated.
+    // =========================================
+    // AUTHENTICATION CHECK
+    // =========================================
+
     const { data: sessionData, error: sessionError } =
         await db.auth.getSession();
 
@@ -19,7 +22,10 @@ document.addEventListener("DOMContentLoaded", async () => {
         return;
     }
 
-    // Logout functionality
+    // =========================================
+    // LOGOUT
+    // =========================================
+
     const logoutBtn = document.querySelector("#logoutBtn");
 
     if (logoutBtn) {
@@ -45,7 +51,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     // =========================================
-    // CHANGE PASSWORD FUNCTIONALITY
+    // CHANGE PASSWORD
     // =========================================
 
     const changePasswordBtn = document.querySelector("#changePasswordBtn");
@@ -56,20 +62,19 @@ document.addEventListener("DOMContentLoaded", async () => {
     const passwordMessage = document.querySelector("#passwordMessage");
     const savePasswordBtn = document.querySelector("#savePasswordBtn");
 
-    // Open password window
     if (changePasswordBtn && passwordModal) {
         changePasswordBtn.addEventListener("click", () => {
             passwordModal.style.display = "flex";
-            passwordMessage.textContent = "";
-            changePasswordForm.reset();
+
+            if (passwordMessage) passwordMessage.textContent = "";
+            if (changePasswordForm) changePasswordForm.reset();
         });
     }
 
-    // Close password window
     function closePasswordWindow() {
-        passwordModal.style.display = "none";
-        changePasswordForm.reset();
-        passwordMessage.textContent = "";
+        if (passwordModal) passwordModal.style.display = "none";
+        if (changePasswordForm) changePasswordForm.reset();
+        if (passwordMessage) passwordMessage.textContent = "";
     }
 
     if (closePasswordModal) {
@@ -80,12 +85,12 @@ document.addEventListener("DOMContentLoaded", async () => {
         cancelPasswordBtn.addEventListener("click", closePasswordWindow);
     }
 
-    // Save new password
     if (changePasswordForm) {
         changePasswordForm.addEventListener("submit", async (event) => {
             event.preventDefault();
 
             const newPassword = document.querySelector("#newPassword").value;
+
             const confirmPassword =
                 document.querySelector("#confirmPassword").value;
 
@@ -126,6 +131,10 @@ document.addEventListener("DOMContentLoaded", async () => {
         });
     }
 
+    // =========================================
+    // HELPER FUNCTIONS
+    // =========================================
+
     const escapeHtml = (value) => {
         return String(value ?? "").replace(
             /[&<>"']/g,
@@ -149,15 +158,36 @@ document.addEventListener("DOMContentLoaded", async () => {
         return value ? value : "N/A";
     };
 
+    // =========================================
+    // SORTING
+    // =========================================
+
     let currentSort = {
         column: "territory_no",
         direction: "asc",
     };
 
-    // Retrieve records directly from Supabase.
+    function updateSortIcons() {
+        document.querySelectorAll("th[data-sort]").forEach((header) => {
+            const icon = header.querySelector(".sort-icon");
+
+            if (!icon) return;
+
+            if (header.dataset.sort === currentSort.column) {
+                icon.textContent = currentSort.direction === "asc" ? "▲" : "▼";
+            } else {
+                icon.textContent = "↕";
+            }
+        });
+    }
+
+    // =========================================
+    // RETRIEVE TERRITORY RECORDS
+    // =========================================
+
     async function requestTerritories() {
         const form = document.querySelector("#filterForm");
-        const formData = new FormData(form || undefined);
+        const formData = form ? new FormData(form) : new FormData();
 
         const assignedTo = formData.get("assigned_to") || "";
         const completionStatus = formData.get("date_completed") || "";
@@ -176,7 +206,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             query = query.is("date_completed", null);
         }
 
-        // Determine sorting.
+        // Sorting.
         let sortDirection = currentSort.direction;
 
         if (completionStatus === "asc" || completionStatus === "desc") {
@@ -214,7 +244,10 @@ document.addEventListener("DOMContentLoaded", async () => {
         return data || [];
     }
 
-    // Update summary cards and record count.
+    // =========================================
+    // SUMMARY CARDS
+    // =========================================
+
     function updateSummary(records) {
         const total = records.length;
 
@@ -226,111 +259,147 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         const assigned = records.filter((record) => record.assign_to).length;
 
-        document.querySelector("#totalTerritories").textContent = total;
-        document.querySelector("#completedTerritories").textContent = completed;
-        document.querySelector("#pendingTerritories").textContent = pending;
-        document.querySelector("#assignedTerritories").textContent = assigned;
+        const totalElement = document.querySelector("#totalTerritories");
+        const completedElement = document.querySelector(
+            "#completedTerritories",
+        );
+        const pendingElement = document.querySelector("#pendingTerritories");
+        const assignedElement = document.querySelector("#assignedTerritories");
+        const recordCount = document.querySelector("#recordCount");
 
-        document.querySelector("#recordCount").textContent = `${total} Records`;
+        if (totalElement) totalElement.textContent = total;
+        if (completedElement) completedElement.textContent = completed;
+        if (pendingElement) pendingElement.textContent = pending;
+        if (assignedElement) assignedElement.textContent = assigned;
+        if (recordCount) recordCount.textContent = `${total} Records`;
+
+        // Service year display.
+        const serviceYearDisplay = document.querySelector(
+            "#serviceYearDisplay",
+        );
+
+        if (serviceYearDisplay) {
+            const years = [
+                ...new Set(
+                    records
+                        .map((record) => record.service_year)
+                        .filter(Boolean),
+                ),
+            ];
+
+            serviceYearDisplay.textContent = years.length
+                ? years.join(", ")
+                : "N/A";
+        }
     }
 
-    // Display territory records.
+    // =========================================
+    // DISPLAY TERRITORY RECORDS
+    // =========================================
+
+    function assignmentCell(record, section) {
+        const suffix = section === 1 ? "" : `_${section}`;
+
+        const assignedTo = record[`assign_to${suffix}`] || "";
+        const dateAssigned = record[`date_assigned${suffix}`] || "";
+        const dateCompleted = record[`date_completed${suffix}`] || "";
+
+        // Apply light green background when either date is filled in
+        const hasDates = Boolean(dateAssigned || dateCompleted);
+
+        return `
+        <td class="assignment-column ${hasDates ? "assignment-filled" : ""}">
+            <div class="assignment-cell">
+                <div class="assignment-label">Assigned to</div>
+
+                <div class="assignment-person">
+                    ${escapeHtml(getDisplayValue(assignedTo))}
+                </div>
+
+                <div class="assignment-date-headings">
+                    <span>Date assigned</span>
+                    <span>Date completed</span>
+                </div>
+
+                <div class="assignment-date-values">
+                    <span>${escapeHtml(getDisplayValue(dateAssigned))}</span>
+                    <span>${escapeHtml(getDisplayValue(dateCompleted))}</span>
+                </div>
+            </div>
+        </td>
+    `;
+    }
+
     function displayTerritories(records) {
         updateSummary(records);
 
         tbody.innerHTML = records
             .map(
                 (record) => `
-            <tr id="row-${escapeHtml(record.id)}" data-editing="false">
+                    <tr id="row-${escapeHtml(record.id)}"
+                        data-editing="false">
 
-                <td>
-                    <div class="barangay-cell">
-                        <span class="location-icon">📍</span>
-                        <strong>${escapeHtml(record.brgy_name)}</strong>
-                    </div>
-                </td>
-
-                <td>
-                    <span class="year-badge">
-                        ${escapeHtml(record.service_year)}
-                    </span>
-                </td>
-
-                <td>
-                    <strong class="territory-number">
-                        ${escapeHtml(record.territory_no)}
-                    </strong>
-                </td>
-
-                <td>${escapeHtml(getDisplayValue(record.last_completed))}</td>
-
-                <td>
-                    ${
-                        record.assign_to
-                            ? `<span class="group-badge">${escapeHtml(record.assign_to)}</span>`
-                            : `<span class="muted-text">Unassigned</span>`
-                    }
-                </td>
-
-                <td>${escapeHtml(getDisplayValue(record.date_assigned))}</td>
-
-                <td>
-                    ${
-                        record.date_completed
-                            ? `
-                            <span class="status-badge completed">
-                                <span class="status-dot"></span>
-                                Completed
-                            </span>
-                            <div class="date-subtext">
-                                ${escapeHtml(record.date_completed)}
+                        <td>
+                            <div class="barangay-cell">
+                                <span class="location-icon">📍</span>
+                                <strong>${escapeHtml(record.brgy_name)}</strong>
                             </div>
-                        `
-                            : `
-                            <span class="status-badge pending">
-                                <span class="status-dot"></span>
-                                Pending
-                            </span>
-                        `
-                    }
-                </td>
+                        </td>
 
-                <td>
-                    <button
-                        type="button"
-                        class="edit-btn"
-                        data-id="${escapeHtml(record.id)}">
-                        ✎ Edit
-                    </button>
-                </td>
+                        <td>
+                            <strong class="territory-number">
+                                ${escapeHtml(record.territory_no)}
+                            </strong>
+                        </td>
 
-            </tr>
-        `,
+                        <td>
+                            ${escapeHtml(getDisplayValue(record.last_completed))}
+                        </td>
+
+                        ${assignmentCell(record, 1)}
+                        ${assignmentCell(record, 2)}
+                        ${assignmentCell(record, 3)}
+
+                        <td>
+                            <button
+                                type="button"
+                                class="edit-btn"
+                                data-id="${escapeHtml(record.id)}">
+                                ✎ Edit
+                            </button>
+                        </td>
+
+                    </tr>
+                `,
             )
             .join("");
 
         updateSortIcons();
     }
 
-    // Load records.
+    // =========================================
+    // LOAD TERRITORIES
+    // =========================================
+
     async function loadTerritories() {
         try {
             tbody.innerHTML = `
                 <tr>
-                    <td colspan="8" style="text-align:center;padding:25px;">
+                    <td colspan="7" style="text-align:center;padding:25px;">
                         Loading territory records...
                     </td>
                 </tr>
             `;
 
             const records = await requestTerritories();
+
             displayTerritories(records);
         } catch (error) {
-            console.error(error);
+            console.error("Loading territories failed:", error);
 
             tbody.innerHTML = `
                 <tr>
-                    <td colspan="8" style="text-align:center;padding:25px;">
+                    <td colspan="7" style="text-align:center;padding:25px;">
                         Unable to load territory records.
                     </td>
                 </tr>
@@ -340,98 +409,179 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
     }
 
+    // =========================================
+    // START EDITING
+    // =========================================
+
     function startEditing(row) {
         if (!row || row.dataset.editing === "true") return;
 
         const cells = row.querySelectorAll("td");
 
-        if (cells.length < 8) return;
+        // Seven columns:
+        // 0 Barangay
+        // 1 Territory number
+        // 2 Last completed
+        // 3 Assignment 1
+        // 4 Assignment 2
+        // 5 Assignment 3
+        // 6 Actions
+
+        if (cells.length !== 7) {
+            console.error(
+                "Cannot edit: expected 7 table cells but found",
+                cells.length,
+                row,
+            );
+            return;
+        }
 
         row.dataset.editing = "true";
 
         const original = {
-            last_completed: cells[3].textContent.trim(),
-            assign_to:
-                cells[4].querySelector(".group-badge")?.textContent.trim() ||
-                "",
-            date_assigned: cells[5].textContent.trim(),
-            date_completed:
-                cells[6].querySelector(".date-subtext")?.textContent.trim() ||
-                "",
+            last_completed: cells[2].textContent.trim(),
+            assignments: [],
         };
+
+        // Preserve all three assignment sections.
+        for (let section = 1; section <= 3; section++) {
+            const cell = cells[2 + section];
+
+            const person = cell.querySelector(".assignment-person");
+            const dates = cell.querySelectorAll(".assignment-date-values span");
+
+            original.assignments.push({
+                assign_to: person
+                    ? person.textContent.trim() === "N/A"
+                        ? ""
+                        : person.textContent.trim()
+                    : "",
+
+                date_assigned: dates[0]
+                    ? dates[0].textContent.trim() === "N/A"
+                        ? ""
+                        : dates[0].textContent.trim()
+                    : "",
+
+                date_completed: dates[1]
+                    ? dates[1].textContent.trim() === "N/A"
+                        ? ""
+                        : dates[1].textContent.trim()
+                    : "",
+            });
+        }
 
         row.dataset.original = JSON.stringify(original);
 
-        cells[3].innerHTML = `
-            <input type="date" class="edit-input"
+        // Last completed date.
+        cells[2].innerHTML = `
+            <input type="date"
+                class="edit-input"
                 value="${escapeHtml(getDateValue(original.last_completed))}">
         `;
 
         const groups = ["Group 1", "Group 2", "Group 3", "Congregation", "RP"];
 
-        cells[4].innerHTML = `
-            <select class="edit-input">
-                <option value="">Select Group</option>
-                ${groups
-                    .map(
-                        (group) => `
-                    <option value="${group}"
-                        ${original.assign_to === group ? "selected" : ""}>
-                        ${group}
-                    </option>
-                `,
-                    )
-                    .join("")}
-            </select>
-        `;
+        // Create three independent assignment editors.
+        for (let section = 1; section <= 3; section++) {
+            const cell = cells[2 + section];
+            const data = original.assignments[section - 1];
 
-        cells[5].innerHTML = `
-            <input type="date" class="edit-input"
-                value="${escapeHtml(getDateValue(original.date_assigned))}">
-        `;
+            if (!cell || !data) {
+                console.error("Assignment cell not found:", section);
+                row.dataset.editing = "false";
+                return;
+            }
 
+            cell.innerHTML = `
+                <div class="assignment-editor">
+                    <label>Assigned to</label>
+
+                    <select class="edit-input assignment-group">
+                        <option value="">Select Group</option>
+
+                        ${groups
+                            .map(
+                                (group) => `
+                                    <option value="${escapeHtml(group)}"
+                                        ${data.assign_to === group ? "selected" : ""}>
+                                        ${escapeHtml(group)}
+                                    </option>
+                                `,
+                            )
+                            .join("")}
+                    </select>
+
+                    <div class="assignment-date-headings">
+                        <span>Date assigned</span>
+                        <span>Date completed</span>
+                    </div>
+
+                    <div class="assignment-date-inputs">
+                        <input type="date"
+                            class="edit-input assignment-date-assigned"
+                            value="${escapeHtml(getDateValue(data.date_assigned))}">
+
+                        <input type="date"
+                            class="edit-input assignment-date-completed"
+                            value="${escapeHtml(getDateValue(data.date_completed))}">
+                    </div>
+                </div>
+            `;
+        }
+
+        // Actions column.
         cells[6].innerHTML = `
-            <input type="date" class="edit-input"
-                value="${escapeHtml(getDateValue(original.date_completed))}">
-        `;
-
-        cells[7].innerHTML = `
             <button type="button" class="save-btn">Save</button>
             <button type="button" class="cancel-btn">Cancel</button>
         `;
     }
 
+    // =========================================
+    // CANCEL EDITING
+    // =========================================
+
     function cancelEditing(row) {
+        if (!row) return;
+
         const original = JSON.parse(row.dataset.original || "{}");
         const cells = row.querySelectorAll("td");
 
-        cells[3].textContent = getDisplayValue(original.last_completed);
+        if (cells.length !== 7 || !original.assignments) return;
 
-        cells[4].innerHTML = original.assign_to
-            ? `<span class="group-badge">${escapeHtml(original.assign_to)}</span>`
-            : `<span class="muted-text">Unassigned</span>`;
+        cells[2].textContent = getDisplayValue(original.last_completed);
 
-        cells[5].textContent = getDisplayValue(original.date_assigned);
+        // Restore all three assignment sections.
+        for (let section = 1; section <= 3; section++) {
+            const cell = cells[2 + section];
+            const data = original.assignments[section - 1];
 
-        cells[6].innerHTML = original.date_completed
-            ? `
-                <span class="status-badge completed">
-                    <span class="status-dot"></span>
-                    Completed
-                </span>
-                <div class="date-subtext">
-                    ${escapeHtml(original.date_completed)}
+            if (!cell || !data) continue;
+
+            cell.innerHTML = `
+                <div class="assignment-cell">
+                    <div class="assignment-label">Assigned to</div>
+
+                    <div class="assignment-person">
+                        ${escapeHtml(getDisplayValue(data.assign_to))}
+                    </div>
+
+                    <div class="assignment-date-headings">
+                        <span>Date assigned</span>
+                        <span>Date completed</span>
+                    </div>
+
+                    <div class="assignment-date-values">
+                        <span>${escapeHtml(getDisplayValue(data.date_assigned))}</span>
+                        <span>${escapeHtml(getDisplayValue(data.date_completed))}</span>
+                    </div>
                 </div>
-            `
-            : `
-                <span class="status-badge pending">
-                    <span class="status-dot"></span>
-                    Pending
-                </span>
             `;
+        }
 
-        cells[7].innerHTML = `
-            <button type="button" class="edit-btn"
+        cells[6].innerHTML = `
+            <button type="button"
+                class="edit-btn"
                 data-id="${escapeHtml(row.id.replace("row-", ""))}">
                 ✎ Edit
             </button>
@@ -441,32 +591,72 @@ document.addEventListener("DOMContentLoaded", async () => {
         delete row.dataset.original;
     }
 
+    // =========================================
+    // SAVE EDITING
+    // =========================================
+
     async function saveEditing(row) {
+        if (!row) return;
+
         const cells = row.querySelectorAll("td");
         const saveButton = row.querySelector(".save-btn");
 
+        if (cells.length !== 7 || !saveButton) return;
+
+        const lastCompletedInput = cells[2].querySelector("input");
+
+        if (!lastCompletedInput) {
+            alert("Last completed date field is missing.");
+            return;
+        }
+
         const updatedData = {
             id: row.id.replace("row-", ""),
-            last_completed: cells[3].querySelector("input").value,
-            assign_to: cells[4].querySelector("select").value,
-            date_assigned: cells[5].querySelector("input").value,
-            date_completed: cells[6].querySelector("input").value,
+            last_completed: lastCompletedInput.value || null,
         };
 
-        if (!updatedData.assign_to) {
-            alert("Please select an assigned group.");
-            return;
+        // Collect all three assignment sections.
+        for (let section = 1; section <= 3; section++) {
+            const cell = cells[2 + section];
+
+            const groupInput = cell.querySelector(".assignment-group");
+            const assignedInput = cell.querySelector(
+                ".assignment-date-assigned",
+            );
+            const completedInput = cell.querySelector(
+                ".assignment-date-completed",
+            );
+
+            if (!groupInput || !assignedInput || !completedInput) {
+                alert(`Assignment section ${section} is incomplete.`);
+                return;
+            }
+
+            const suffix = section === 1 ? "" : `_${section}`;
+
+            updatedData[`assign_to${suffix}`] = groupInput.value || null;
+
+            updatedData[`date_assigned${suffix}`] = assignedInput.value || null;
+
+            updatedData[`date_completed${suffix}`] =
+                completedInput.value || null;
         }
 
         saveButton.disabled = true;
         saveButton.textContent = "Saving...";
 
         try {
+            if (typeof window.updateTerritory !== "function") {
+                throw new Error(
+                    "The territory update function is not available.",
+                );
+            }
+
             await window.updateTerritory(updatedData);
 
             await loadTerritories();
 
-            alert("Territory updated successfully!");
+            alert("Territory assignments updated successfully!");
         } catch (error) {
             console.error("Save error:", error);
 
@@ -477,7 +667,10 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
     }
 
-    // Edit, Save, Cancel.
+    // =========================================
+    // EDIT, SAVE, CANCEL EVENT LISTENER
+    // =========================================
+
     tbody.addEventListener("click", async (event) => {
         const button = event.target.closest("button");
 
@@ -489,10 +682,12 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         if (button.classList.contains("edit-btn")) {
             startEditing(row);
+            return;
         }
 
         if (button.classList.contains("cancel-btn")) {
             cancelEditing(row);
+            return;
         }
 
         if (button.classList.contains("save-btn")) {
@@ -500,7 +695,10 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
     });
 
-    // Apply filters.
+    // =========================================
+    // FILTER BUTTON
+    // =========================================
+
     const filterBtn = document.querySelector("#filterBtn");
 
     if (filterBtn) {
@@ -510,7 +708,10 @@ document.addEventListener("DOMContentLoaded", async () => {
         });
     }
 
-    // Column sorting.
+    // =========================================
+    // COLUMN SORTING
+    // =========================================
+
     document.querySelectorAll("th[data-sort]").forEach((header) => {
         header.addEventListener("click", async () => {
             const column = header.dataset.sort;
@@ -526,20 +727,9 @@ document.addEventListener("DOMContentLoaded", async () => {
         });
     });
 
-    function updateSortIcons() {
-        document.querySelectorAll("th[data-sort]").forEach((header) => {
-            const icon = header.querySelector(".sort-icon");
+    // =========================================
+    // INITIAL DATABASE LOADING
+    // =========================================
 
-            if (!icon) return;
-
-            if (header.dataset.sort === currentSort.column) {
-                icon.textContent = currentSort.direction === "asc" ? "▲" : "▼";
-            } else {
-                icon.textContent = "↕";
-            }
-        });
-    }
-
-    // Initial database loading.
-    loadTerritories();
+    await loadTerritories();
 });
