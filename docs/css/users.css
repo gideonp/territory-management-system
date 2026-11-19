@@ -1,0 +1,391 @@
+
+/* =========================================
+   USER MANAGEMENT - CLASSIC WINDOWS DESIGN
+========================================= */
+
+body {
+    background: #c0c0c0;
+    font-family: Tahoma, Arial, sans-serif;
+    color: #222;
+}
+
+.territory-container {
+    max-width: 1250px;
+    margin: 18px auto;
+    padding: 12px;
+}
+
+/* HEADER */
+
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 14px;
+    margin-bottom: 12px;
+    background: #d4d0c8;
+    border: 2px solid #ffffff;
+    border-right-color: #808080;
+    border-bottom-color: #808080;
+}
+
+.page-header h1 {
+    font-size: 22px;
+    font-weight: bold;
+    margin: 3px 0;
+    color: #000080;
+}
+
+.page-header p {
+    font-size: 12px;
+    margin: 3px 0 0;
+    color: #444;
+}
+
+.header-label {
+    font-size: 10px;
+    font-weight: bold;
+    letter-spacing: 1px;
+    color: #555;
+}
+
+/* WINDOWS STYLE BUTTONS */
+
+button {
+    font-family: Tahoma, Arial, sans-serif;
+    font-size: 12px;
+    cursor: pointer;
+}
+
+.header-actions button,
+.users-toolbar button,
+.user-actions button {
+    background: #d4d0c8;
+    color: #000;
+    border: 2px solid #fff;
+    border-right-color: #404040;
+    border-bottom-color: #404040;
+    padding: 6px 12px;
+    font-weight: bold;
+}
+
+.header-actions button:active,
+.users-toolbar button:active,
+.user-actions button:active {
+    border: 2px solid #404040;
+    border-right-color: #fff;
+    border-bottom-color: #fff;
+}
+
+/* SUMMARY CARDS */
+
+.summary-cards {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.summary-card {
+    background: #d4d0c8;
+    border: 2px solid #fff;
+    border-right-color: #808080;
+    border-bottom-color: #808080;
+    padding: 10px 12px;
+    min-height: 65px;
+}
+
+.summary-card h3 {
+    font-size: 11px;
+    font-weight: normal;
+    color: #444;
+    margin: 0 0 7px;
+}
+
+.summary-card div {
+    font-size: 23px;
+    font-weight: bold;
+    color: #000080;
+}
+
+/* MAIN PANEL */
+
+.territory-card {
+    background: #d4d0c8;
+    border: 2px solid #fff;
+    border-right-color: #808080;
+    border-bottom-color: #808080;
+    padding: 10px;
+    box-shadow: none;
+    border-radius: 0;
+}
+
+.users-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.users-toolbar h2 {
+    font-size: 15px;
+    color: #000080;
+    margin: 0;
+}
+
+/* TABLE */
+
+.table-responsive {
+    width: 100%;
+    overflow-x: auto;
+    background: #fff;
+    border: 2px solid #808080;
+}
+
+.table-responsive table {
+    width: 100%;
+    min-width: 700px;
+    border-collapse: collapse;
+    table-layout: fixed;
+    background: #fff;
+    font-size: 12px;
+}
+
+.table-responsive th {
+    background: #d4d0c8;
+    color: #000;
+    font-weight: bold;
+    text-align: left;
+    padding: 8px 7px;
+    border: 1px solid #808080;
+    white-space: nowrap;
+}
+
+.table-responsive td {
+    padding: 7px;
+    border: 1px solid #c0c0c0;
+    overflow-wrap: anywhere;
+    vertical-align: middle;
+}
+
+.table-responsive tbody tr:nth-child(even) {
+    background: #f1f1f1;
+}
+
+.table-responsive tbody tr:hover {
+    background: #e5edff;
+}
+
+/* COLUMN WIDTHS */
+
+.table-responsive th:nth-child(1),
+.table-responsive td:nth-child(1) {
+    width: 22%;
+}
+
+.table-responsive th:nth-child(2),
+.table-responsive td:nth-child(2) {
+    width: 18%;
+}
+
+.table-responsive th:nth-child(3),
+.table-responsive td:nth-child(3) {
+    width: 11%;
+}
+
+.table-responsive th:nth-child(4),
+.table-responsive td:nth-child(4) {
+    width: 11%;
+}
+
+.table-responsive th:nth-child(5),
+.table-responsive td:nth-child(5) {
+    width: 13%;
+}
+
+.table-responsive th:nth-child(6),
+.table-responsive td:nth-child(6) {
+    width: 25%;
+}
+
+/* ACTION BUTTONS */
+
+.user-actions {
+    white-space: nowrap;
+}
+
+.user-actions button {
+    padding: 4px 7px;
+    margin: 2px 1px;
+    font-size: 11px;
+}
+
+.edit-user-btn {
+    color: #000080;
+}
+
+.toggle-user-btn {
+    color: #006000;
+}
+
+.delete-user-btn {
+    background: #d4d0c8;
+    color: #800000;
+    border: 2px solid #fff;
+    border-right-color: #404040;
+    border-bottom-color: #404040;
+    padding: 4px 7px;
+    margin: 2px 1px;
+    font-size: 11px;
+}
+
+.delete-user-btn:hover {
+    background: #ffcccc;
+}
+
+/* MODAL WINDOWS */
+
+.password-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 12px;
+    background: rgba(0, 0, 0, 0.35);
+}
+
+.password-window {
+    width: 100%;
+    max-width: 400px;
+    background: #d4d0c8;
+    border: 2px solid #fff;
+    border-right-color: #404040;
+    border-bottom-color: #404040;
+    box-shadow: 2px 2px 0 #000;
+    border-radius: 0;
+}
+
+.password-titlebar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 6px 8px;
+    background: #000080;
+    color: #fff;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.password-titlebar button {
+    width: 22px;
+    height: 20px;
+    padding: 0;
+    background: #d4d0c8;
+    border: 2px solid #fff;
+    border-right-color: #404040;
+    border-bottom-color: #404040;
+    font-weight: bold;
+}
+
+.password-content {
+    padding: 14px;
+}
+
+.password-content p {
+    font-size: 12px;
+    margin: 0 0 12px;
+}
+
+.password-content label {
+    display: block;
+    font-size: 12px;
+    margin: 9px 0 4px;
+}
+
+.password-content input,
+.password-content select {
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+    padding: 7px;
+    font-family: Tahoma, Arial, sans-serif;
+    font-size: 12px;
+    background: #fff;
+    border: 2px solid #808080;
+    border-right-color: #fff;
+    border-bottom-color: #fff;
+    border-radius: 0;
+}
+
+.password-content input:focus,
+.password-content select:focus {
+    outline: 1px dotted #000;
+}
+
+.password-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    padding: 10px 14px;
+    border-top: 1px solid #aaa;
+}
+
+.password-footer button {
+    min-width: 85px;
+    padding: 6px 10px;
+    background: #d4d0c8;
+    border: 2px solid #fff;
+    border-right-color: #404040;
+    border-bottom-color: #404040;
+    font-size: 12px;
+}
+
+.password-footer button:active {
+    border: 2px solid #404040;
+    border-right-color: #fff;
+    border-bottom-color: #fff;
+}
+
+#addUserMessage,
+#editUserMessage {
+    margin-top: 10px;
+    font-size: 12px;
+}
+
+/* DISABLED BUTTONS */
+
+button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* RESPONSIVE */
+
+@media (max-width: 700px) {
+    .territory-container {
+        margin: 8px auto;
+        padding: 7px;
+    }
+
+    .page-header {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .summary-cards {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .users-toolbar {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .table-responsive table {
+        min-width: 700px;
+    }
+}
