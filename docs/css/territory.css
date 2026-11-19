@@ -1301,4 +1301,13 @@ thead th, tbody td{
 select {
   font-size:12px !important;
 }
- 
+ /* Read-only assigned group during editing */
+#territoryTableBody .assignment-readonly {
+    background-color: #e8e8e8;
+    border: 1px solid #c8c8c8;
+    border-radius: 4px;
+    padding: 5px 8px;
+    font-size: 13px !important;
+    color: #333;
+    cursor: not-allowed;
+}

@@ -298,16 +298,16 @@ document.addEventListener("DOMContentLoaded", async () => {
     // =========================================
 
     function assignmentCell(record, section) {
-        const suffix = section === 1 ? "" : `_${section}`;
+    // All three sections use the first assignment's group.
+    const assignedTo = record.assign_to || "";
 
-        const assignedTo = record[`assign_to${suffix}`] || "";
-        const dateAssigned = record[`date_assigned${suffix}`] || "";
-        const dateCompleted = record[`date_completed${suffix}`] || "";
+    const suffix = section === 1 ? "" : `_${section}`;
+    const dateAssigned = record[`date_assigned${suffix}`] || "";
+    const dateCompleted = record[`date_completed${suffix}`] || "";
 
-        // Apply light green background when either date is filled in
-        const hasDates = Boolean(dateAssigned || dateCompleted);
+    const hasDates = Boolean(dateAssigned || dateCompleted);
 
-        return `
+    return `
         <td class="assignment-column ${hasDates ? "assignment-filled" : ""}">
             <div class="assignment-cell">
                 <div class="assignment-label">Assigned to</div>
@@ -328,7 +328,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             </div>
         </td>
     `;
-    }
+}
 
     function displayTerritories(records) {
         updateSummary(records);
@@ -414,258 +414,163 @@ document.addEventListener("DOMContentLoaded", async () => {
     // =========================================
 
     function startEditing(row) {
-        if (!row || row.dataset.editing === "true") return;
+    if (!row || row.dataset.editing === "true") return;
 
-        const cells = row.querySelectorAll("td");
+    const cells = row.querySelectorAll("td");
 
-        // Seven columns:
-        // 0 Barangay
-        // 1 Territory number
-        // 2 Last completed
-        // 3 Assignment 1
-        // 4 Assignment 2
-        // 5 Assignment 3
-        // 6 Actions
+    if (cells.length !== 7) {
+        console.error("Cannot edit: expected 7 table cells but found", cells.length);
+        return;
+    }
 
-        if (cells.length !== 7) {
-            console.error(
-                "Cannot edit: expected 7 table cells but found",
-                cells.length,
-                row,
-            );
-            return;
-        }
+    row.dataset.editing = "true";
 
-        row.dataset.editing = "true";
+    const original = {
+        last_completed: cells[2].textContent.trim(),
+        assign_to: "",
+        assignments: [],
+    };
 
-        const original = {
-            last_completed: cells[2].textContent.trim(),
-            assignments: [],
-        };
+    // The first assignment is the source of the assigned group.
+    const firstPerson = cells[3].querySelector(".assignment-person");
 
-        // Preserve all three assignment sections.
-        for (let section = 1; section <= 3; section++) {
-            const cell = cells[2 + section];
+    original.assign_to =
+        firstPerson && firstPerson.textContent.trim() !== "N/A"
+            ? firstPerson.textContent.trim()
+            : "";
 
-            const person = cell.querySelector(".assignment-person");
-            const dates = cell.querySelectorAll(".assignment-date-values span");
+    // Preserve the three assignment dates.
+    for (let section = 1; section <= 3; section++) {
+        const cell = cells[2 + section];
+        const dates = cell.querySelectorAll(
+            ".assignment-date-values span"
+        );
 
-            original.assignments.push({
-                assign_to: person
-                    ? person.textContent.trim() === "N/A"
-                        ? ""
-                        : person.textContent.trim()
+        original.assignments.push({
+            date_assigned:
+                dates[0] && dates[0].textContent.trim() !== "N/A"
+                    ? dates[0].textContent.trim()
                     : "",
 
-                date_assigned: dates[0]
-                    ? dates[0].textContent.trim() === "N/A"
-                        ? ""
-                        : dates[0].textContent.trim()
+            date_completed:
+                dates[1] && dates[1].textContent.trim() !== "N/A"
+                    ? dates[1].textContent.trim()
                     : "",
+        });
+    }
 
-                date_completed: dates[1]
-                    ? dates[1].textContent.trim() === "N/A"
-                        ? ""
-                        : dates[1].textContent.trim()
-                    : "",
-            });
-        }
+    row.dataset.original = JSON.stringify(original);
 
-        row.dataset.original = JSON.stringify(original);
+    // Last completed date.
+    cells[2].innerHTML = `
+        <input type="date"
+            class="edit-input"
+            value="${escapeHtml(getDateValue(original.last_completed))}">
+    `;
 
-        // Last completed date.
-        cells[2].innerHTML = `
-            <input type="date"
-                class="edit-input"
-                value="${escapeHtml(getDateValue(original.last_completed))}">
-        `;
+    // Display the assigned group as read-only.
+    // Only the two date fields are editable.
+    for (let section = 1; section <= 3; section++) {
+        const cell = cells[2 + section];
+        const data = original.assignments[section - 1];
 
-        const groups = ["Group 1", "Group 2", "Group 3", "Congregation", "RP"];
+        cell.innerHTML = `
+            <div class="assignment-editor">
+                <label>Assigned to</label>
 
-        // Create three independent assignment editors.
-        for (let section = 1; section <= 3; section++) {
-            const cell = cells[2 + section];
-            const data = original.assignments[section - 1];
-
-            if (!cell || !data) {
-                console.error("Assignment cell not found:", section);
-                row.dataset.editing = "false";
-                return;
-            }
-
-            cell.innerHTML = `
-                <div class="assignment-editor">
-                    <label>Assigned to</label>
-
-                    <select class="edit-input assignment-group">
-                        <option value="">Select Group</option>
-
-                        ${groups
-                            .map(
-                                (group) => `
-                                    <option value="${escapeHtml(group)}"
-                                        ${data.assign_to === group ? "selected" : ""}>
-                                        ${escapeHtml(group)}
-                                    </option>
-                                `,
-                            )
-                            .join("")}
-                    </select>
-
-                    <div class="assignment-date-headings">
-                        <span>Date assigned</span>
-                        <span>Date completed</span>
-                    </div>
-
-                    <div class="assignment-date-inputs">
-                        <input type="date"
-                            class="edit-input assignment-date-assigned"
-                            value="${escapeHtml(getDateValue(data.date_assigned))}">
-
-                        <input type="date"
-                            class="edit-input assignment-date-completed"
-                            value="${escapeHtml(getDateValue(data.date_completed))}">
-                    </div>
+                <div class="assignment-person assignment-readonly">
+                    ${escapeHtml(getDisplayValue(original.assign_to))}
                 </div>
-            `;
-        }
 
-        // Actions column.
-        cells[6].innerHTML = `
-            <button type="button" class="save-btn">Save</button>
-            <button type="button" class="cancel-btn">Cancel</button>
+                <div class="assignment-date-headings">
+                    <span>Date assigned</span>
+                    <span>Date completed</span>
+                </div>
+
+                <div class="assignment-date-inputs">
+                    <input type="date"
+                        class="edit-input assignment-date-assigned"
+                        value="${escapeHtml(getDateValue(data.date_assigned))}">
+
+                    <input type="date"
+                        class="edit-input assignment-date-completed"
+                        value="${escapeHtml(getDateValue(data.date_completed))}">
+                </div>
+            </div>
         `;
     }
+
+    // Actions column.
+    cells[6].innerHTML = `
+        <button type="button" class="save-btn">Save</button>
+        <button type="button" class="cancel-btn">Cancel</button>
+    `;
+}
 
     // =========================================
     // CANCEL EDITING
     // =========================================
 
-    function cancelEditing(row) {
-        if (!row) return;
+   function cancelEditing(row) {
+    if (!row) return;
 
-        const original = JSON.parse(row.dataset.original || "{}");
-        const cells = row.querySelectorAll("td");
+    const original = JSON.parse(row.dataset.original || "{}");
+    const cells = row.querySelectorAll("td");
 
-        if (cells.length !== 7 || !original.assignments) return;
+    if (cells.length !== 7 || !original.assignments) return;
 
-        cells[2].textContent = getDisplayValue(original.last_completed);
+    cells[2].textContent = getDisplayValue(original.last_completed);
 
-        // Restore all three assignment sections.
-        for (let section = 1; section <= 3; section++) {
-            const cell = cells[2 + section];
-            const data = original.assignments[section - 1];
+    for (let section = 1; section <= 3; section++) {
+        const cell = cells[2 + section];
+        const data = original.assignments[section - 1];
 
-            if (!cell || !data) continue;
+        if (!cell || !data) continue;
 
-            cell.innerHTML = `
-                <div class="assignment-cell">
-                    <div class="assignment-label">Assigned to</div>
+        const hasDates = Boolean(
+            data.date_assigned || data.date_completed
+        );
 
-                    <div class="assignment-person">
-                        ${escapeHtml(getDisplayValue(data.assign_to))}
-                    </div>
+        cell.classList.toggle("assignment-filled", hasDates);
 
-                    <div class="assignment-date-headings">
-                        <span>Date assigned</span>
-                        <span>Date completed</span>
-                    </div>
+        cell.innerHTML = `
+            <div class="assignment-cell">
+                <div class="assignment-label">Assigned to</div>
 
-                    <div class="assignment-date-values">
-                        <span>${escapeHtml(getDisplayValue(data.date_assigned))}</span>
-                        <span>${escapeHtml(getDisplayValue(data.date_completed))}</span>
-                    </div>
+                <div class="assignment-person">
+                    ${escapeHtml(getDisplayValue(original.assign_to))}
                 </div>
-            `;
-        }
 
-        cells[6].innerHTML = `
-            <button type="button"
-                class="edit-btn"
-                data-id="${escapeHtml(row.id.replace("row-", ""))}">
-                ✎ Edit
-            </button>
+                <div class="assignment-date-headings">
+                    <span>Date assigned</span>
+                    <span>Date completed</span>
+                </div>
+
+                <div class="assignment-date-values">
+                    <span>${escapeHtml(getDisplayValue(data.date_assigned))}</span>
+                    <span>${escapeHtml(getDisplayValue(data.date_completed))}</span>
+                </div>
+            </div>
         `;
-
-        row.dataset.editing = "false";
-        delete row.dataset.original;
     }
+
+    cells[6].innerHTML = `
+        <button type="button"
+            class="edit-btn"
+            data-id="${escapeHtml(row.id.replace("row-", ""))}">
+            ✎ Edit
+        </button>
+    `;
+
+    row.dataset.editing = "false";
+    delete row.dataset.original;
+}
 
     // =========================================
     // SAVE EDITING
     // =========================================
 
-    async function saveEditing(row) {
-        if (!row) return;
-
-        const cells = row.querySelectorAll("td");
-        const saveButton = row.querySelector(".save-btn");
-
-        if (cells.length !== 7 || !saveButton) return;
-
-        const lastCompletedInput = cells[2].querySelector("input");
-
-        if (!lastCompletedInput) {
-            alert("Last completed date field is missing.");
-            return;
-        }
-
-        const updatedData = {
-            id: row.id.replace("row-", ""),
-            last_completed: lastCompletedInput.value || null,
-        };
-
-        // Collect all three assignment sections.
-        for (let section = 1; section <= 3; section++) {
-            const cell = cells[2 + section];
-
-            const groupInput = cell.querySelector(".assignment-group");
-            const assignedInput = cell.querySelector(
-                ".assignment-date-assigned",
-            );
-            const completedInput = cell.querySelector(
-                ".assignment-date-completed",
-            );
-
-            if (!groupInput || !assignedInput || !completedInput) {
-                alert(`Assignment section ${section} is incomplete.`);
-                return;
-            }
-
-            const suffix = section === 1 ? "" : `_${section}`;
-
-            updatedData[`assign_to${suffix}`] = groupInput.value || null;
-
-            updatedData[`date_assigned${suffix}`] = assignedInput.value || null;
-
-            updatedData[`date_completed${suffix}`] =
-                completedInput.value || null;
-        }
-
-        saveButton.disabled = true;
-        saveButton.textContent = "Saving...";
-
-        try {
-            if (typeof window.updateTerritory !== "function") {
-                throw new Error(
-                    "The territory update function is not available.",
-                );
-            }
-
-            await window.updateTerritory(updatedData);
-
-            await loadTerritories();
-
-            alert("Territory assignments updated successfully!");
-        } catch (error) {
-            console.error("Save error:", error);
-
-            alert(error.message || "Failed to update territory.");
-
-            saveButton.disabled = false;
-            saveButton.textContent = "Save";
-        }
-    }
+     
 
     // =========================================
     // EDIT, SAVE, CANCEL EVENT LISTENER
