@@ -1388,3 +1388,51 @@ select {
 .table-responsive::-webkit-scrollbar-track {
     background: #d4d0c8;
 }
+/* =========================================
+   TERRITORY NUMBER ABOVE BARANGAY
+========================================= */
+
+#territoryTableBody .territory-details-cell {
+    min-width: 160px;
+    padding: 8px 10px;
+}
+
+#territoryTableBody .territory-details {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 5px;
+}
+
+#territoryTableBody .territory-number {
+    display: inline-block;
+    padding: 3px 7px;
+    background: #d4d0c8;
+    border: 1px solid #808080;
+    color: #000080;
+    font-size: 12px !important;
+    font-weight: bold;
+}
+
+#territoryTableBody .barangay-cell {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+#territoryTableBody .barangay-cell strong {
+    font-size: 13px !important;
+    color: #000;
+}
+/* Center Territory No. and Barangay column */
+#territoryTableBody .territory-details-cell {
+    text-align: center;
+}
+
+#territoryTableBody .territory-details {
+    align-items: center;
+}
+
+#territoryTableBody .barangay-cell {
+    justify-content: center;
+}
