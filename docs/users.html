@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 
@@ -16,54 +15,57 @@
 
     <div class="territory-container">
 
-        <div class="page-header">
+        <header class="page-header">
             <div>
-                <div class="header-label">ADMINISTRATION</div>
+                <span class="header-label">ADMINISTRATION</span>
                 <h1>User Management</h1>
-                <p>Manage system accounts and access permissions.</p>
+                <p>Manage system accounts, roles, and access permissions.</p>
             </div>
 
             <div class="header-actions">
-                <button type="button" id="backDashboardBtn">
-                    ← Dashboard
+                <button type="button" id="backDashboardBtn" class="export-word-btn">
+                    ← Back to Dashboard
                 </button>
             </div>
-        </div>
+        </header>
 
-        <div class="summary-cards">
+        <section class="summary-cards" aria-label="Account summary">
             <div class="summary-card">
                 <h3>Total Users</h3>
-                <div id="totalUsers">0</div>
+                <div id="totalUsers" class="summary-value">0</div>
             </div>
 
             <div class="summary-card">
                 <h3>Active Users</h3>
-                <div id="activeUsers">0</div>
+                <div id="activeUsers" class="summary-value">0</div>
             </div>
 
             <div class="summary-card">
                 <h3>Inactive Users</h3>
-                <div id="inactiveUsers">0</div>
+                <div id="inactiveUsers" class="summary-value">0</div>
             </div>
 
             <div class="summary-card">
                 <h3>Administrators</h3>
-                <div id="adminUsers">0</div>
+                <div id="adminUsers" class="summary-value">0</div>
             </div>
-        </div>
+        </section>
 
-        <div class="territory-card">
-
+        <main class="territory-card">
             <div class="users-toolbar">
-                <h2>Registered Accounts</h2>
+                <div>
+                    <h2>Registered Accounts</h2>
+                </div>
 
-                <button type="button" id="addUserBtn">
-                    + Add New User
-                </button>
+                <div class="users-toolbar-actions">
+                    <button type="button" id="addUserBtn" class="filter-button">
+                        + Add New User
+                    </button>
+                </div>
             </div>
 
             <div class="table-responsive">
-                <table>
+                <table class="territory-table users-table">
                     <thead>
                         <tr>
                             <th>Email</th>
@@ -77,102 +79,86 @@
 
                     <tbody id="usersTableBody">
                         <tr>
-                            <td colspan="6">Loading users...</td>
+                            <td colspan="6" class="table-message">Loading users...</td>
                         </tr>
                     </tbody>
                 </table>
             </div>
-        </div>
+        </main>
 
     </div>
 
-    <!-- Add New User Window -->
+    <!-- Add New User Modal -->
     <div id="addUserModal" class="password-modal" style="display: none;">
-
         <div class="password-window">
-
             <div class="password-titlebar">
                 <span>Create New User Account</span>
-                <button type="button" id="closeAddUserModal">X</button>
+                <button type="button" id="closeAddUserModal" aria-label="Close modal">X</button>
             </div>
 
             <form id="addUserForm">
-
                 <div class="password-content">
+                    <p>Enter account details for the new user.</p>
 
-                    <p>Enter the new user's account information.</p>
+                    <label for="userFullName">Full Name</label>
+                    <input type="text" id="userFullName" name="userFullName" required maxlength="150" placeholder="e.g. Juan Dela Cruz">
 
-                    <label for="userFullName">Full Name:</label>
-                    <input type="text" id="userFullName" required maxlength="150">
+                    <label for="userEmail">Email Address</label>
+                    <input type="email" id="userEmail" name="userEmail" required placeholder="name@example.com">
 
-                    <label for="userEmail">Email Address:</label>
-                    <input type="email" id="userEmail" required>
+                    <label for="userPassword">Temporary Password</label>
+                    <input type="password" id="userPassword" name="userPassword" minlength="6" required autocomplete="new-password" placeholder="At least 6 characters">
 
-                    <label for="userPassword">Temporary Password:</label>
-                    <input type="password" id="userPassword" minlength="6" required autocomplete="new-password">
-
-                    <label for="userRole">Account Role:</label>
-                    <select id="userRole" required>
+                    <label for="userRole">Account Role</label>
+                    <select id="userRole" name="userRole" required>
                         <option value="user">Regular User</option>
                         <option value="admin">Administrator</option>
                     </select>
 
-                    <div id="addUserMessage"></div>
-
+                    <div id="addUserMessage" role="status" aria-live="polite"></div>
                 </div>
 
                 <div class="password-footer">
-                    <button type="submit" id="saveNewUserBtn">Create Account</button>
-                    <button type="button" id="cancelAddUserBtn">Cancel</button>
+                    <button type="submit" id="saveNewUserBtn" class="save-btn">Create Account</button>
+                    <button type="button" id="cancelAddUserBtn" class="cancel-btn">Cancel</button>
                 </div>
-
             </form>
-
         </div>
-
     </div>
 
-    <!-- Edit User Window -->
+    <!-- Edit User Modal -->
     <div id="editUserModal" class="password-modal" style="display: none;">
-
         <div class="password-window">
-
             <div class="password-titlebar">
                 <span>Edit User Account</span>
-                <button type="button" id="closeEditUserModal">X</button>
+                <button type="button" id="closeEditUserModal" aria-label="Close modal">X</button>
             </div>
 
             <form id="editUserForm">
-
                 <div class="password-content">
+                    <input type="hidden" id="editUserId" name="editUserId">
 
-                    <input type="hidden" id="editUserId">
+                    <label for="editUserEmail">Email Address</label>
+                    <input type="email" id="editUserEmail" name="editUserEmail" disabled>
 
-                    <label for="editUserFullName">Full Name:</label>
-                    <input type="text" id="editUserFullName" maxlength="150" required>
+                    <label for="editUserFullName">Full Name</label>
+                    <input type="text" id="editUserFullName" name="editUserFullName" maxlength="150" required>
 
-                    <label for="editUserEmail">Email Address:</label>
-                    <input type="email" id="editUserEmail" disabled>
-
-                    <label for="editUserRole">Account Role:</label>
-                    <select id="editUserRole" required>
+                    <label for="editUserRole">Account Role</label>
+                    <select id="editUserRole" name="editUserRole" required>
                         <option value="user">Regular User</option>
                         <option value="admin">Administrator</option>
                     </select>
 
-                    <div id="editUserMessage"></div>
-
+                    <div id="editUserMessage" role="status" aria-live="polite"></div>
                 </div>
 
                 <div class="password-footer">
-                    <button type="submit" id="saveEditUserBtn">Save Changes</button>
-                    <button type="button" id="cancelEditUserBtn">Cancel</button>
+                    <button type="submit" id="saveEditUserBtn" class="save-btn">Save Changes</button>
+                    <button type="button" id="cancelEditUserBtn" class="cancel-btn">Cancel</button>
                 </div>
-
             </form>
-
         </div>
-
     </div>
 
     <!-- Supabase -->

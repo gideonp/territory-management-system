@@ -311,12 +311,10 @@ document.addEventListener("DOMContentLoaded", function () {
 
             setTimeout(() => URL.revokeObjectURL(downloadUrl), 1000);
 
-            alert(
-                "Word document exported successfully!\n\n" +
-                    "76 territory records processed.\n" +
-                    "Territory data values: 6pt.\n" +
-                    "Table headers: unchanged.",
-            );
+            
+            window.showAlert("Word document exported successfully!\n\n" +
+                    "76 territory records processed.\n", "Export Complete")                
+                   
         } catch (error) {
             console.error("Word export failed:", error);
 

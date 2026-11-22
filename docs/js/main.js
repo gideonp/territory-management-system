@@ -1,14 +1,16 @@
-
 /**
  * TERRITORY MANAGEMENT
  * Supabase database update handler
  */
 
-
 window.updateTerritory = async function (data) {
     try {
         if (!window.supabaseClient) {
             throw new Error("Supabase is not initialized.");
+        }
+
+        if (data?.id === undefined || data?.id === null || data.id === "") {
+            throw new Error("Missing territory record ID.");
         }
 
         const updateData = {
@@ -29,29 +31,38 @@ window.updateTerritory = async function (data) {
             date_assigned_3: data.date_assigned_3 || null,
             date_completed_3: data.date_completed_3 || null,
 
-            updated_at: new Date().toISOString()
+            updated_at: new Date().toISOString(),
         };
 
         const { data: updatedRecord, error } =
             await window.supabaseClient
                 .from("territory_records")
                 .update(updateData)
-                .eq("id", Number(data.id))
+                .eq("id", data.id)
                 .select()
                 .single();
 
         if (error) {
             console.error("Update failed:", error);
-            throw new Error(
-                error.message || "Failed to update territory."
-            );
+            throw new Error(error.message || "Failed to update territory.");
         }
 
         return updatedRecord;
-
     } catch (error) {
         console.error("Territory update error:", error);
         throw error;
     }
 };
 
+document.addEventListener("DOMContentLoaded", () => {
+    const filterForm = document.querySelector("#filterForm");
+
+    if (filterForm) {
+        filterForm.addEventListener("submit", async (event) => {
+            event.preventDefault();
+            if (typeof window.loadTerritories === "function") {
+                await window.loadTerritories();
+            }
+        });
+    }
+});

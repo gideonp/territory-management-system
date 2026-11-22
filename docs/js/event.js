@@ -1,11 +1,102 @@
-
 document.addEventListener("DOMContentLoaded", async () => {
+    // =========================================
+    // CUSTOM SYSTEM MODAL (ALERT & CONFIRM)
+    // =========================================
+
+    window.showAlert = function showAlert(message, title = "Notice") {
+        return new Promise((resolve) => {
+            const modal = document.querySelector("#systemModal");
+            const titleEl = document.querySelector("#systemModalTitle");
+            const msgEl = document.querySelector("#systemModalMessage");
+            const okBtn = document.querySelector("#systemModalOkBtn");
+            const cancelBtn = document.querySelector("#systemModalCancelBtn");
+            const closeBtn = document.querySelector("#closeSystemModal");
+
+            const resolvedTitle =
+                typeof title === "string" && title.trim() ? title : "Notice";
+
+            if (!modal) {
+                alert(message);
+                resolve();
+                return;
+            }
+
+            titleEl.textContent = resolvedTitle;
+            msgEl.textContent = message;
+            cancelBtn.style.display = "none";
+            okBtn.textContent = "OK";
+            modal.style.display = "flex";
+
+            const cleanup = () => {
+                modal.style.display = "none";
+                okBtn.removeEventListener("click", onOk);
+                closeBtn.removeEventListener("click", onOk);
+                resolve();
+            };
+
+            const onOk = () => cleanup();
+
+            okBtn.addEventListener("click", onOk);
+            closeBtn.addEventListener("click", onOk);
+            okBtn.focus();
+        });
+    };
+
+    window.showConfirm = function showConfirm(
+        message,
+        title = "Confirm Action",
+    ) {
+        return new Promise((resolve) => {
+            const modal = document.querySelector("#systemModal");
+            const titleEl = document.querySelector("#systemModalTitle");
+            const msgEl = document.querySelector("#systemModalMessage");
+            const okBtn = document.querySelector("#systemModalOkBtn");
+            const cancelBtn = document.querySelector("#systemModalCancelBtn");
+            const closeBtn = document.querySelector("#closeSystemModal");
+
+            const resolvedTitle =
+                typeof title === "string" && title.trim()
+                    ? title
+                    : "Confirm Action";
+
+            if (!modal) {
+                resolve(confirm(message));
+                return;
+            }
+
+            titleEl.textContent = resolvedTitle;
+            msgEl.textContent = message;
+            cancelBtn.style.display = "inline-block";
+            okBtn.textContent = "Yes";
+            modal.style.display = "flex";
+
+            const cleanup = (result) => {
+                modal.style.display = "none";
+                okBtn.removeEventListener("click", onYes);
+                cancelBtn.removeEventListener("click", onNo);
+                closeBtn.removeEventListener("click", onNo);
+                resolve(result);
+            };
+
+            const onYes = () => cleanup(true);
+            const onNo = () => cleanup(false);
+
+            okBtn.addEventListener("click", onYes);
+            cancelBtn.addEventListener("click", onNo);
+            closeBtn.addEventListener("click", onNo);
+            okBtn.focus();
+        });
+    };
+
     const tbody = document.querySelector("#territoryTableBody");
 
     if (!tbody) return;
 
     if (!window.supabaseClient) {
-        alert("Supabase connection is not initialized.");
+        await window.showAlert(
+            "Supabase connection is not initialized.",
+            "Connection Error",
+        );
         return;
     }
 
@@ -31,7 +122,11 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     if (logoutBtn) {
         logoutBtn.addEventListener("click", async () => {
-            if (!confirm("Are you sure you want to log out?")) return;
+            const confirmed = await window.showConfirm(
+                "Are you sure you want to log out?",
+                "Logout",
+            );
+            if (!confirmed) return;
 
             logoutBtn.disabled = true;
             logoutBtn.textContent = "Signing out...";
@@ -39,7 +134,10 @@ document.addEventListener("DOMContentLoaded", async () => {
             const { error } = await db.auth.signOut();
 
             if (error) {
-                alert("Logout failed: " + error.message);
+                await window.showAlert(
+                    "Logout failed: " + error.message,
+                    "Error",
+                );
                 logoutBtn.disabled = false;
                 logoutBtn.textContent = "↪ Logout";
                 return;
@@ -53,19 +151,13 @@ document.addEventListener("DOMContentLoaded", async () => {
     // CHANGE PASSWORD
     // =========================================
 
-    const changePasswordBtn =
-        document.querySelector("#changePasswordBtn");
+    const changePasswordBtn = document.querySelector("#changePasswordBtn");
     const passwordModal = document.querySelector("#passwordModal");
-    const closePasswordModal =
-        document.querySelector("#closePasswordModal");
-    const cancelPasswordBtn =
-        document.querySelector("#cancelPasswordBtn");
-    const changePasswordForm =
-        document.querySelector("#changePasswordForm");
-    const passwordMessage =
-        document.querySelector("#passwordMessage");
-    const savePasswordBtn =
-        document.querySelector("#savePasswordBtn");
+    const closePasswordModal = document.querySelector("#closePasswordModal");
+    const cancelPasswordBtn = document.querySelector("#cancelPasswordBtn");
+    const changePasswordForm = document.querySelector("#changePasswordForm");
+    const passwordMessage = document.querySelector("#passwordMessage");
+    const savePasswordBtn = document.querySelector("#savePasswordBtn");
 
     if (changePasswordBtn && passwordModal) {
         changePasswordBtn.addEventListener("click", () => {
@@ -93,8 +185,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         changePasswordForm.addEventListener("submit", async (event) => {
             event.preventDefault();
 
-            const newPassword =
-                document.querySelector("#newPassword").value;
+            const newPassword = document.querySelector("#newPassword").value;
             const confirmPassword =
                 document.querySelector("#confirmPassword").value;
 
@@ -128,8 +219,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             }
 
             passwordMessage.style.color = "green";
-            passwordMessage.textContent =
-                "Password successfully changed!";
+            passwordMessage.textContent = "Password successfully changed!";
 
             savePasswordBtn.disabled = false;
             savePasswordBtn.textContent = "OK";
@@ -180,8 +270,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             if (!icon) return;
 
             if (header.dataset.sort === currentSort.column) {
-                icon.textContent =
-                    currentSort.direction === "asc" ? "▲" : "▼";
+                icon.textContent = currentSort.direction === "asc" ? "▲" : "▼";
             } else {
                 icon.textContent = "↕";
             }
@@ -198,6 +287,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         const assignedTo = formData.get("assigned_to") || "";
         const completionStatus = formData.get("date_completed") || "";
+        const brgySearch = String(formData.get("brgy_search") || "").trim();
 
         let query = db.from("territory_records").select("*");
 
@@ -209,6 +299,10 @@ document.addEventListener("DOMContentLoaded", async () => {
             query = query.not("date_completed", "is", null);
         } else if (completionStatus === "not completed") {
             query = query.is("date_completed", null);
+        }
+
+        if (brgySearch) {
+            query = query.ilike("brgy_name", `%${brgySearch}%`);
         }
 
         let sortDirection = currentSort.direction;
@@ -261,17 +355,14 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         const pending = total - completed;
 
-        const assigned = records.filter(
-            (record) => record.assign_to,
-        ).length;
+        const assigned = records.filter((record) => record.assign_to).length;
 
         const totalElement = document.querySelector("#totalTerritories");
-        const completedElement =
-            document.querySelector("#completedTerritories");
-        const pendingElement =
-            document.querySelector("#pendingTerritories");
-        const assignedElement =
-            document.querySelector("#assignedTerritories");
+        const completedElement = document.querySelector(
+            "#completedTerritories",
+        );
+        const pendingElement = document.querySelector("#pendingTerritories");
+        const assignedElement = document.querySelector("#assignedTerritories");
         const recordCount = document.querySelector("#recordCount");
 
         if (totalElement) totalElement.textContent = total;
@@ -280,8 +371,9 @@ document.addEventListener("DOMContentLoaded", async () => {
         if (assignedElement) assignedElement.textContent = assigned;
         if (recordCount) recordCount.textContent = `${total} Records`;
 
-        const serviceYearDisplay =
-            document.querySelector("#serviceYearDisplay");
+        const serviceYearDisplay = document.querySelector(
+            "#serviceYearDisplay",
+        );
 
         if (serviceYearDisplay) {
             const years = [
@@ -412,9 +504,14 @@ document.addEventListener("DOMContentLoaded", async () => {
                 </tr>
             `;
 
-            alert(error.message || "Unable to load records.");
+            await window.showAlert(
+                error.message || "Unable to load records.",
+                "Error",
+            );
         }
     }
+
+    window.loadTerritories = loadTerritories;
 
     // =========================================
     // START EDITING
@@ -425,7 +522,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         const cells = row.querySelectorAll("td");
 
-        // New table structure has exactly 6 columns.
         if (cells.length !== 6) {
             console.error(
                 "Cannot edit: expected 6 table cells but found",
@@ -434,16 +530,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             return;
         }
 
-        // Correct column positions:
-        // 0 = Territory No. / Barangay
-        // 1 = Last Date Completed
-        // 2 = Assignment 1
-        // 3 = Assignment 2
-        // 4 = Assignment 3
-        // 5 = Actions
-
-        const firstPerson =
-            cells[2].querySelector(".assignment-person");
+        const firstPerson = cells[2].querySelector(".assignment-person");
 
         const assignedTo =
             firstPerson && firstPerson.textContent.trim() !== "N/A"
@@ -459,9 +546,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         for (let section = 1; section <= 3; section++) {
             const cell = cells[section + 1];
 
-            const dates = cell.querySelectorAll(
-                ".assignment-date-values span",
-            );
+            const dates = cell.querySelectorAll(".assignment-date-values span");
 
             original.assignments.push({
                 date_assigned:
@@ -479,7 +564,6 @@ document.addEventListener("DOMContentLoaded", async () => {
         row.dataset.original = JSON.stringify(original);
         row.dataset.editing = "true";
 
-        // Edit last completed date in column 1.
         cells[1].innerHTML = `
             <input
                 type="date"
@@ -487,7 +571,6 @@ document.addEventListener("DOMContentLoaded", async () => {
                 value="${escapeHtml(getDateValue(original.last_completed))}">
         `;
 
-        // Edit assignment dates in columns 2, 3 and 4.
         for (let section = 1; section <= 3; section++) {
             const cell = cells[section + 1];
             const data = original.assignments[section - 1];
@@ -520,7 +603,6 @@ document.addEventListener("DOMContentLoaded", async () => {
             `;
         }
 
-        // Actions in column 5.
         cells[5].innerHTML = `
             <div class="edit-actions">
                 <button type="button" class="save-btn">Save</button>
@@ -541,19 +623,15 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         if (cells.length !== 6 || !original.assignments) return;
 
-        // Restore last completed date.
         cells[1].textContent = getDisplayValue(original.last_completed);
 
-        // Restore all three assignment sections.
         for (let section = 1; section <= 3; section++) {
             const cell = cells[section + 1];
             const data = original.assignments[section - 1];
 
             if (!cell || !data) continue;
 
-            const hasDates = Boolean(
-                data.date_assigned || data.date_completed,
-            );
+            const hasDates = Boolean(data.date_assigned || data.date_completed);
 
             cell.classList.toggle("assignment-filled", hasDates);
 
@@ -578,7 +656,6 @@ document.addEventListener("DOMContentLoaded", async () => {
             `;
         }
 
-        // Restore Edit button.
         cells[5].innerHTML = `
             <button
                 type="button"
@@ -602,7 +679,10 @@ document.addEventListener("DOMContentLoaded", async () => {
         const cells = row.querySelectorAll("td");
 
         if (cells.length !== 6) {
-            alert("Unable to save: table columns do not match.");
+            await window.showAlert(
+                "Unable to save: table columns do not match.",
+                "Error",
+            );
             return;
         }
 
@@ -618,7 +698,6 @@ document.addEventListener("DOMContentLoaded", async () => {
                 cells[1].querySelector(".last-completed-input").value || null,
         };
 
-        // Save the three assignment date sections.
         for (let section = 1; section <= 3; section++) {
             const cell = cells[section + 1];
 
@@ -632,8 +711,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
             const suffix = section === 1 ? "" : `_${section}`;
 
-            updatedData[`date_assigned${suffix}`] =
-                assignedInput.value || null;
+            updatedData[`date_assigned${suffix}`] = assignedInput.value || null;
 
             updatedData[`date_completed${suffix}`] =
                 completedInput.value || null;
@@ -651,15 +729,19 @@ document.addEventListener("DOMContentLoaded", async () => {
                 throw error;
             }
 
-            alert("Territory record successfully updated.");
+            await window.showAlert(
+                "Territory record successfully updated.",
+                "Saved",
+            );
 
             await loadTerritories();
         } catch (error) {
             console.error("Saving territory failed:", error);
 
-            alert(
+            await window.showAlert(
                 "Unable to save territory record: " +
-                (error.message || "Unknown error"),
+                    (error.message || "Unknown error"),
+                "Error",
             );
 
             if (saveBtn) {
@@ -698,13 +780,22 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
 
     // =========================================
-    // FILTER BUTTON
+    // FILTER BUTTON & FORM SUBMIT
     // =========================================
 
     const filterBtn = document.querySelector("#filterBtn");
 
     if (filterBtn) {
         filterBtn.addEventListener("click", async (event) => {
+            event.preventDefault();
+            await loadTerritories();
+        });
+    }
+
+    const filterForm = document.querySelector("#filterForm");
+
+    if (filterForm) {
+        filterForm.addEventListener("submit", async (event) => {
             event.preventDefault();
             await loadTerritories();
         });
@@ -719,8 +810,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             const column = header.dataset.sort;
 
             currentSort.direction =
-                currentSort.column === column &&
-                currentSort.direction === "asc"
+                currentSort.column === column && currentSort.direction === "asc"
                     ? "desc"
                     : "asc";
 

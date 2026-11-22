@@ -85,14 +85,21 @@
                         <h2>Territory Filters</h2>
                         <p>Filter and sort territory records</p>
                     </div>
-
-                    <span class="filter-tag">ADVANCED FILTERS</span>
                 </div>
 
                 <form id="filterForm" class="filter-grid">
-                    <div class="form-group">
+                     <div class="form-group">
+                        <label for="brgy_search">Barangay</label>
+                        <input
+                            type="search"
+                            name="brgy_search"
+                            id="brgy_search"
+                            placeholder="Search barangay..."
+                            autocomplete="off"
+                        />
+                    </div>
+                    <div class="form-group">                        
                         <label for="assigned_to">Assigned To</label>
-
                         <select name="assigned_to" id="assigned_to">
                             <option value="">All Groups</option>
                             <option value="Group 1">Group 1</option>
@@ -102,7 +109,7 @@
                             <option value="RP">RP</option>
                         </select>
                     </div>
-
+                   
                     <div class="form-group">
                         <label for="date_completed">Completion Status</label>
 
@@ -156,10 +163,10 @@
                         <thead>
                             <tr>
                                 <th data-sort="territory_no">
-                                    Territory No. / Barangay
+                                    Territory No. / Barangay<span class="sort-icon">↕</span>
                                 </th>
                                 <th data-sort="last_completed">
-                                    Last Date Completed*
+                                    Last Date Completed<span class="sort-icon">↕</span>
                                 </th>
                                 <th>Assignment Details</th>
                                 <th>Assignment Details</th>
@@ -230,7 +237,36 @@
                 </form>
             </div>
         </div>
+        <!-- System Alert / Confirm Modal -->
+        <div id="systemModal" class="password-modal" style="display: none">
+            <div class="password-window">
+                <div class="password-titlebar">
+                    <span id="systemModalTitle">Notice</span>
+                    <button type="button" id="closeSystemModal">X</button>
+                </div>
 
+                <div class="password-content">
+                    <p id="systemModalMessage"></p>
+                </div>
+
+                <div class="password-footer">
+                    <button
+                        type="button"
+                        id="systemModalOkBtn"
+                        class="save-btn"
+                    >
+                        OK
+                    </button>
+                    <button
+                        type="button"
+                        id="systemModalCancelBtn"
+                        style="display: none"
+                    >
+                        Cancel
+                    </button>
+                </div>
+            </div>
+        </div>
         <!-- Supabase and Dashboard Scripts -->
         <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
