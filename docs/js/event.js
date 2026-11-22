@@ -231,6 +231,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     // HELPER FUNCTIONS
     // =========================================
 
+    const START_LOCATION = "10.978085724130256, 124.90395117844318";
+
     const escapeHtml = (value) => {
         return String(value ?? "").replace(
             /[&<>"']/g,
@@ -252,6 +254,21 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     const getDisplayValue = (value) => {
         return value ? value : "N/A";
+    };
+
+    const getBarangayMapUrl = (brgyName) => {
+        const cleanBrgy = String(brgyName || "").trim();
+        if (!cleanBrgy) return "";
+
+        const destination = `${cleanBrgy}, Burauen, Leyte, Philippines`;
+        const params = new URLSearchParams({
+            api: "1",
+            origin: START_LOCATION,
+            destination,
+            travelmode: "driving",
+        });
+
+        return `https://www.google.com/maps/dir/?${params.toString()}`;
     };
 
     // =========================================
@@ -434,23 +451,45 @@ document.addEventListener("DOMContentLoaded", async () => {
         updateSummary(records);
 
         tbody.innerHTML = records
-            .map(
-                (record) => `
+            .map((record) => {
+                const mapUrl = getBarangayMapUrl(record.brgy_name);
+
+                return `
                     <tr id="row-${escapeHtml(record.id)}"
                         data-editing="false">
 
-                        <td class="territory-details-cell">
-                            <div class="territory-details">
-                                <strong class="territory-number">
-                                    ${escapeHtml(record.territory_no)}
-                                </strong>
+                       <td class="territory-details-cell">
+    <div class="territory-details">
+        <span class="territory-number">
+            ${escapeHtml(record.territory_no)}
+        </span>
 
-                                <div class="barangay-cell">
-                                    <span class="location-icon">📍</span>
-                                    <strong>${escapeHtml(record.brgy_name)}</strong>
-                                </div>
-                            </div>
-                        </td>
+        <div class="barangay-cell">
+            ${
+                mapUrl
+                    ? `<a
+                           href="${escapeHtml(mapUrl)}"
+                           target="_blank"
+                           rel="noopener noreferrer"
+                           class="map-link-btn"
+                           title="Open route from ${escapeHtml(START_LOCATION)} to ${escapeHtml(record.brgy_name)}"
+                           aria-label="Open map directions to ${escapeHtml(record.brgy_name)}">
+                           <svg class="map-pin-icon" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                               <path d="M12 21s-6-5.35-6-11a6 6 0 0 1 12 0c0 5.65-6 11-6 11z"></path>
+                               <circle cx="12" cy="10" r="2.2"></circle>
+                           </svg>
+                       </a>`
+                    : `<span class="location-icon" aria-hidden="true">
+                           <svg class="map-pin-icon" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                               <path d="M12 21s-6-5.35-6-11a6 6 0 0 1 12 0c0 5.65-6 11-6 11z"></path>
+                               <circle cx="12" cy="10" r="2.2"></circle>
+                           </svg>
+                       </span>`
+            }
+            <span class="barangay-name">${escapeHtml(record.brgy_name)}</span>
+        </div>
+    </div>
+</td>
 
                         <td>
                             ${escapeHtml(getDisplayValue(record.last_completed))}
@@ -470,8 +509,8 @@ document.addEventListener("DOMContentLoaded", async () => {
                         </td>
 
                     </tr>
-                `,
-            )
+                `;
+            })
             .join("");
 
         updateSortIcons();
@@ -481,7 +520,18 @@ document.addEventListener("DOMContentLoaded", async () => {
     // LOAD TERRITORIES
     // =========================================
 
+    let brgySearchTimeout = null;
+
+    function clearBrgySearchTimeout() {
+        if (brgySearchTimeout) {
+            clearTimeout(brgySearchTimeout);
+            brgySearchTimeout = null;
+        }
+    }
+
     async function loadTerritories() {
+        clearBrgySearchTimeout();
+
         try {
             tbody.innerHTML = `
                 <tr>
@@ -780,7 +830,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
 
     // =========================================
-    // FILTER BUTTON & FORM SUBMIT
+    // FILTER BUTTON, FORM SUBMIT & BRGY SEARCH DEBOUNCE
     // =========================================
 
     const filterBtn = document.querySelector("#filterBtn");
@@ -798,6 +848,18 @@ document.addEventListener("DOMContentLoaded", async () => {
         filterForm.addEventListener("submit", async (event) => {
             event.preventDefault();
             await loadTerritories();
+        });
+    }
+
+    const brgySearchInput = document.querySelector("#brgy_search");
+
+    if (brgySearchInput) {
+        brgySearchInput.addEventListener("input", () => {
+            clearBrgySearchTimeout();
+            brgySearchTimeout = setTimeout(async () => {
+                brgySearchTimeout = null;
+                await loadTerritories();
+            }, 500);
         });
     }
 

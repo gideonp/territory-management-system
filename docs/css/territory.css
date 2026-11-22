@@ -657,3 +657,283 @@ input[type="password"] {
 .filter-grid .filter-button:hover:not(:disabled) {
     background: #1d4ed8;
 }
+.barangay-cell {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    max-width: 100%;
+}
+
+.map-link-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    border-radius: 4px;
+    border: 1px solid #bfdbfe;
+    background: #eff6ff;
+    text-decoration: none;
+    font-size: 12px;
+    line-height: 1;
+    flex-shrink: 0;
+    transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.map-link-btn:hover {
+    background: #dbeafe;
+    border-color: #60a5fa;
+}
+.barangay-cell {
+    position: relative;
+    display: flex;
+    align-items: center;
+    padding-left: 28px;
+    min-height: 22px;
+    min-width: 0;
+    width: 100%;
+    text-align: left;
+}
+
+.map-link-btn,
+.location-icon {
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    border-radius: 5px;
+    border: 1px solid #bfdbfe;
+    background: #eff6ff;
+    color: #1d4ed8;
+    text-decoration: none;
+    transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.map-link-btn:hover {
+    background: #1d4ed8;
+    border-color: #1d4ed8;
+    color: #ffffff;
+}
+
+.map-link-btn:focus-visible {
+    outline: 2px solid #2563eb;
+    outline-offset: 1px;
+}
+
+.location-icon {
+    border-color: #e5e7eb;
+    background: #f9fafb;
+    color: #6b7280;
+    cursor: default;
+}
+
+.map-pin-icon {
+    width: 13px;
+    height: 13px;
+    display: block;
+}
+
+.barangay-name {
+    display: block;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-weight: 600;
+    color: #111827;
+}
+.barangay-cell {
+    position: relative;
+    display: flex;
+    align-items: center;
+    padding-left: 28px;
+    min-height: 24px;
+    min-width: 0;
+    width: 100%;
+    text-align: left;
+}
+
+.map-link-btn,
+.location-icon {
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    border-radius: 5px;
+    border: 1px solid #bfdbfe;
+    background: #eff6ff;
+    color: #1d4ed8;
+    text-decoration: none;
+    transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.map-link-btn:hover {
+    background: #1d4ed8;
+    border-color: #1d4ed8;
+    color: #ffffff;
+}
+
+.map-link-btn:focus-visible {
+    outline: 2px solid #2563eb;
+    outline-offset: 1px;
+}
+
+.location-icon {
+    border-color: #e5e7eb;
+    background: #f9fafb;
+    color: #6b7280;
+    cursor: default;
+}
+
+.map-pin-icon {
+    width: 13px;
+    height: 13px;
+    display: block;
+}
+
+.barangay-name {
+    display: block;
+    min-width: 0;
+    width: 100%;
+    overflow-wrap: anywhere;
+    word-break: normal;
+    white-space: normal;
+    line-height: 1.3;
+    font-weight: 600;
+    color: #111827;
+}
+
+@media (max-width: 720px) {
+    .territory-table {
+        table-layout: auto;
+        min-width: 640px;
+    }
+
+    .territory-details-cell {
+        min-width: 150px;
+    }
+
+    .barangay-name {
+        font-size: 12px;
+        line-height: 1.35;
+    }
+}
+.territory-details {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 5px;
+    width: 100%;
+    text-align: left;
+}
+
+.territory-number {
+    display: inline-flex;
+    align-items: center;
+    align-self: flex-start;
+    padding: 2px 7px;
+    border-radius: 4px;
+    /* border: 1px solid #bfdbfe; */
+    /* background: #eff6ff; */
+    color: #1e3a8a;
+    font-size: 11.5px;
+    font-weight: 700;
+    line-height: 1.2;
+}
+
+.barangay-cell {
+    position: relative;
+    display: flex;
+    align-items: center;
+    padding-left: 28px;
+    min-height: 24px;
+    min-width: 0;
+    width: 100%;
+    text-align: left;
+}
+
+.map-link-btn,
+.location-icon {
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    border-radius: 5px;
+    border: 1px solid #bfdbfe;
+    background: #eff6ff;
+    color: #1d4ed8;
+    text-decoration: none;
+    transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.map-link-btn:hover {
+    background: #1d4ed8;
+    border-color: #1d4ed8;
+    color: #ffffff;
+}
+
+.map-link-btn:focus-visible {
+    outline: 2px solid #2563eb;
+    outline-offset: 1px;
+}
+
+.location-icon {
+    border-color: #e5e7eb;
+    background: #f9fafb;
+    color: #6b7280;
+    cursor: default;
+}
+
+.map-pin-icon {
+    width: 13px;
+    height: 13px;
+    display: block;
+}
+
+.barangay-name {
+    display: block;
+    min-width: 0;
+    width: 100%;
+    overflow-wrap: anywhere;
+    word-break: normal;
+    white-space: normal;
+    line-height: 1.3;
+    font-weight: 600;
+    color: #111827;
+}
+
+@media (max-width: 720px) {
+    .territory-table {
+        table-layout: auto;
+        min-width: 640px;
+    }
+
+    .territory-details-cell {
+        min-width: 155px;
+    }
+
+    .territory-number {
+        font-size: 11px;
+        padding: 2px 6px;
+    }
+
+    .barangay-name {
+        font-size: 12px;
+        line-height: 1.35;
+    }
+}
